@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlmodel
+alembic
+asyncpg
+fastapi-users[sqlalchemy]
+httpx
+pydantic
+redis
+python-dotenv
+psycopg2-binary
+websockets

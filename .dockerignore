@@ -1,0 +1,10 @@
+# Ignore local frontend dependencies
+**/node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Ignore local python environments
+**/venv/
+**/.venv/
+__pycache__/
+*.pyc
