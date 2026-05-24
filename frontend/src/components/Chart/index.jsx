@@ -75,7 +75,13 @@ export default function Chart({ completedCandles, currentCandle, latency, onSess
         const low         = Math.min(...data.map(c => c.low));
         const totalVolume = data.reduce((sum, c) => sum + (c.volume ?? c.v ?? c.vol ?? 0), 0);        
         
-        onSessionSeed?.({ open, high, low, volume: totalVolume });
+        onSessionSeed?.({
+          candles: data,
+          open,
+          high,
+          low,
+          volume: totalVolume
+        });
       })
       .catch(err => console.error('History fetch failed:', err));
 
@@ -106,6 +112,16 @@ export default function Chart({ completedCandles, currentCandle, latency, onSess
   const latestCandle = currentCandle ?? completedCandles.at(-1) ?? null;
   const firstCandle  = completedCandles[0] ?? currentCandle ?? null;
 
+  const latestVolume =
+    latestCandle?.volume ??
+    latestCandle?.v ??
+    latestCandle?.vol ??
+    null;
+
+
+  console.log(completedCandles)
+  console.log(`Latest Volume ${latestVolume}`)
+
   const tfBtnStyle = tf => ({
     background:   activeTf === tf ? '#1e2530' : 'transparent',
     border:       'none',
@@ -116,7 +132,7 @@ export default function Chart({ completedCandles, currentCandle, latency, onSess
     cursor:       'pointer',
     borderRadius: '3px',
   });
-
+  
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
 
@@ -143,6 +159,7 @@ export default function Chart({ completedCandles, currentCandle, latency, onSess
       <StatsBar
         lastPrice={latestCandle?.close ?? null}
         openPrice={firstCandle?.open   ?? null}
+        volume={latestVolume}
         candleCount={completedCandles.length + (currentCandle ? 1 : 0)}
         latency={latency}
       />
