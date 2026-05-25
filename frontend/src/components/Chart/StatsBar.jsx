@@ -12,10 +12,7 @@ export default function StatsBar({ lastPrice, openPrice, volume, candleCount, la
 
   const formatVolume = (v) => {
     if (v == null || isNaN(v)) return '—';
-    if (v >= 1e9) return `${fmt(v / 1e9, 2)}B`;
-    if (v >= 1e6) return `${fmt(v / 1e6, 2)}M`;
-    if (v >= 1e3) return `${fmt(v / 1e3, 1)}K`;
-    return fmt(v, 2);
+    return fmt(v, 6) + ' BTC';
   };
 
   const cellStyle = {

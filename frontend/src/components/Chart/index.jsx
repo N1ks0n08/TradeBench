@@ -118,7 +118,7 @@ export default function Chart({ completedCandles, currentCandle, latency, onSess
     latestCandle?.vol ??
     null;
 
-
+  // Note: Remove in production, shows all acquired candles
   console.log(completedCandles)
   console.log(`Latest Volume ${latestVolume}`)
 

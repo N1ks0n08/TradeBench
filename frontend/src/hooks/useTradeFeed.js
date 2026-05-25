@@ -66,7 +66,7 @@ export function useTradeFeed(url = WS_TRADE) {
     setLatency(Math.max(0, Date.now() - eventTimeMs));
 
     const candleMinSec = Math.floor(tradeTimeMs / 60000) * 60;
-    const tradeVolume = Number.isNaN(qty) ? 0 : qty * price;
+    const tradeVolume = Number.isNaN(qty) ? 0 : qty; // BTC quantity, consistent with k[5] from history
 
     if (sessionOpenRef.current === null) {
       sessionOpenRef.current = price;
