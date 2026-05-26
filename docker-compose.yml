@@ -15,12 +15,24 @@ services:
       cache:
         condition: service_started
 
+  streamer:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile.prod
+    command: python Streamers/binance_streamer.py
+    environment:
+      - REDIS_URL=redis://cache:6379
+    depends_on:
+      cache:
+        condition: service_started
+    restart: always
+
   frontend:
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile.prod
     ports:
-      - "5173:80"  # Exposes the Nginx server on your local port 5173
+      - "5173:80"
     depends_on:
       - backend
 
