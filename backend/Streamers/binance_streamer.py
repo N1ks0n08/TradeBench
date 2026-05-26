@@ -68,11 +68,38 @@ async def track_raw_trades():
             logging.error(f"Trade stream connection error: {e}. Reconnecting...")
             await asyncio.sleep(3)
 
+# --- ENGINE 3: PARALLEL PARTIAL DEPTH PIPELINE ---
+async def track_depth():
+    url = "wss://stream.binance.us:9443/ws/btcusdt@depth10@100ms"
+    logging.info("Starting isolated Depth stream pipeline...")
+    
+    while True:
+        try:
+            async with websockets.connect(url) as ws:
+                logging.info("Depth Pipe Connected.")
+                while True:
+                    raw_data = await ws.recv()
+                    data = json.loads(raw_data)
+                    
+                    bids = data.get("bids", [])
+                    asks = data.get("asks", [])
+                    
+                    if bids or asks:
+                        r.set("depth:btcusdt", json.dumps({
+                            "bids": bids,
+                            "asks": asks
+                        }))
+                    await asyncio.sleep(0.001)
+        except Exception as e:
+            logging.error(f"Depth stream connection error: {e}. Reconnecting...")
+            await asyncio.sleep(3)
+
 # --- RUN BOTH ENGINES CONCURRENTLY ---
 async def main():
     await asyncio.gather(
         track_book_ticker(),
-        track_raw_trades()
+        track_raw_trades(),
+        track_depth()
     )
 
 if __name__ == "__main__":

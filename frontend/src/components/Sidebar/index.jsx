@@ -4,7 +4,7 @@ import QuoteBlock from './QuoteBlock';
 import PriceLadder from './PriceLadder';
 import SessionPanel from './SessionPanel';
 
-export default function Sidebar({ bid, ask, sessionOpen, sessionHigh, sessionLow, tradeCount }) {
+export default function Sidebar({ bid, ask, bids, asks, sessionOpen, sessionHigh, sessionLow, tradeCount }) {
   return (
     <div style={{
       width: '220px',
@@ -20,7 +20,7 @@ export default function Sidebar({ bid, ask, sessionOpen, sessionHigh, sessionLow
       <QuoteBlock bid={bid} ask={ask} />
 
       <PanelHeader>Order Book Depth</PanelHeader>
-      <PriceLadder bid={bid} ask={ask} />
+      <PriceLadder bids={bids} asks={asks} />
 
       {/* Push session panel to bottom */}
       <div style={{ flex: 1 }} />

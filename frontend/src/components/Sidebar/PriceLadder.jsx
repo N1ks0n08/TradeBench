@@ -2,38 +2,32 @@ import React, { useMemo } from 'react';
 import { LADDER_LEVELS } from '../../constants';
 import { fmt } from '../../utils/fmt';
 
-export default function PriceLadder({ bid, ask }) {
-  const hasData = bid !== null && ask !== null;
+export default function PriceLadder({ bids, asks }) {
+  const hasData = bids?.length > 0 && asks?.length > 0;
 
   const data = useMemo(() => {
     if (!hasData) return null;
-    const mid = (bid + ask) / 2;
-    const tickSize = 0.5; // Synthetic step spacing
-    
-    const asks = [];
-    const bids = [];
 
-    // Generate dynamic artificial sizes and prices
-    for (let i = LADDER_LEVELS; i >= 1; i--) {
-      asks.push({
-        price: ask + (i - 1) * tickSize,
-        size: Math.floor(Math.random() * 500) + 10,
-        type: 'ask'
-      });
-    }
+    // Data comes in as [price_string, qty_string] pairs
+    const parsedAsks = asks
+      .slice(0, LADDER_LEVELS)
+      .map(([p, q]) => ({ price: parseFloat(p), size: parseFloat(q), type: 'ask' }))
+      .sort((a, b) => a.price - b.price); // lowest ask at bottom (closest to mid)
 
-    for (let i = 1; i <= LADDER_LEVELS; i++) {
-      bids.push({
-        price: bid - (i - 1) * tickSize,
-        size: Math.floor(Math.random() * 500) + 10,
-        type: 'bid'
-      });
-    }
+    const parsedBids = bids
+      .slice(0, LADDER_LEVELS)
+      .map(([p, q]) => ({ price: parseFloat(p), size: parseFloat(q), type: 'bid' }))
+      .sort((a, b) => b.price - a.price); // highest bid at top (closest to mid)
 
-    const maxSize = Math.max(...asks.map(a => a.size), ...bids.map(b => b.size)) || 1;
+    const mid = (parsedBids[0].price + parsedAsks[0].price) / 2;
 
-    return { asks, bids, mid, maxSize };
-  }, [bid, ask, hasData]);
+    const maxSize = Math.max(
+      ...parsedAsks.map(a => a.size),
+      ...parsedBids.map(b => b.size)
+    ) || 1;
+
+    return { parsedAsks, parsedBids, mid, maxSize };
+  }, [bids, asks, hasData]);
 
   if (!hasData || !data) {
     return (
@@ -45,12 +39,12 @@ export default function PriceLadder({ bid, ask }) {
         fontFamily: 'IBM Plex Mono, monospace',
         background: '#0d1117'
       }}>
-        Awaiting quote feed…
+        Awaiting depth feed…
       </div>
     );
   }
 
-  const { asks, bids, mid, maxSize } = data;
+  const { parsedAsks, parsedBids, mid, maxSize } = data;
 
   const rowStyle = {
     display: 'grid',
@@ -76,23 +70,27 @@ export default function PriceLadder({ bid, ask }) {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      {/* Synthetic Asks */}
-      {asks.map((level, idx) => {
+      {/* Asks — lowest at bottom, closest to mid */}
+      {[...parsedAsks].reverse().map((level, idx) => {
         const fillPct = (level.size / maxSize) * 100;
         return (
           <div key={`ask-${idx}`} style={rowStyle}>
             <div style={{ ...cellStyle, gridColumn: 1, textAlign: 'left', color: '#475569' }} />
-            <div style={{ ...cellStyle, gridColumn: 2, textAlign: 'center', color: '#22c55e' }}>{fmt(level.price, 2)}</div>
-            <div style={{ ...cellStyle, gridColumn: 3, textAlign: 'right', color: '#94a3b8' }}>{level.size}</div>
+            <div style={{ ...cellStyle, gridColumn: 2, textAlign: 'center', color: '#22c55e' }}>
+              {fmt(level.price, 2)}
+            </div>
+            <div style={{ ...cellStyle, gridColumn: 3, textAlign: 'right', color: '#94a3b8' }}>
+              {level.size.toFixed(4)}
+            </div>
             <div style={{
-              position: 'absolute', right: 0, top: 0, bottom: 0, 
+              position: 'absolute', right: 0, top: 0, bottom: 0,
               width: `${fillPct}%`, background: 'rgba(34, 197, 94, 0.06)', zIndex: 1
             }} />
           </div>
         );
       })}
 
-      {/* Mid Price Divider Row */}
+      {/* Mid Price Divider */}
       <div style={{
         ...rowStyle,
         height: '22px',
@@ -105,16 +103,20 @@ export default function PriceLadder({ bid, ask }) {
         </div>
       </div>
 
-      {/* Synthetic Bids */}
-      {bids.map((level, idx) => {
+      {/* Bids — highest at top, closest to mid */}
+      {parsedBids.map((level, idx) => {
         const fillPct = (level.size / maxSize) * 100;
         return (
           <div key={`bid-${idx}`} style={rowStyle}>
-            <div style={{ ...cellStyle, gridColumn: 1, textAlign: 'left', color: '#94a3b8' }}>{level.size}</div>
-            <div style={{ ...cellStyle, gridColumn: 2, textAlign: 'center', color: '#ef4444' }}>{fmt(level.price, 2)}</div>
+            <div style={{ ...cellStyle, gridColumn: 1, textAlign: 'left', color: '#94a3b8' }}>
+              {level.size.toFixed(4)}
+            </div>
+            <div style={{ ...cellStyle, gridColumn: 2, textAlign: 'center', color: '#ef4444' }}>
+              {fmt(level.price, 2)}
+            </div>
             <div style={{ ...cellStyle, gridColumn: 3, textAlign: 'right', color: '#475569' }} />
             <div style={{
-              position: 'absolute', left: 0, top: 0, bottom: 0, 
+              position: 'absolute', left: 0, top: 0, bottom: 0,
               width: `${fillPct}%`, background: 'rgba(239, 68, 68, 0.06)', zIndex: 1
             }} />
           </div>

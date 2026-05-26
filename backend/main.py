@@ -124,3 +124,19 @@ async def websocket_trades(websocket: WebSocket):
             await asyncio.sleep(0.02)
     except WebSocketDisconnect:
         print("Frontend client disconnected from Raw Trade pipeline.")
+
+# --- PIPELINE 3: ORDER BOOK DEPTH ---
+@app.websocket("/ws/depth/btcusdt")
+async def websocket_depth(websocket: WebSocket):
+    await websocket.accept()
+    print("Frontend client connected to Depth pipeline.")
+    try:
+        last_update = None
+        while True:
+            raw = r.get("depth:btcusdt")
+            if raw and raw != last_update:
+                await websocket.send_text(raw)  # already JSON, no need to re-serialize
+                last_update = raw
+            await asyncio.sleep(0.1)  # 100ms matches the stream update speed
+    except WebSocketDisconnect:
+        print("Frontend client disconnected from Depth pipeline.")

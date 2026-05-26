@@ -1,7 +1,7 @@
 import React from 'react';
 import StatusPill from './ui/StatusPill';
 
-export default function TopBar({ tickerStatus, tradeStatus, utcTime }) {
+export default function TopBar({ tickerStatus, tradeStatus, depthStatus, utcTime }) {
   const pillWrapperStyle = {
     background: '#080b10',
     border: '1px solid #1e2530',
@@ -41,6 +41,7 @@ export default function TopBar({ tickerStatus, tradeStatus, utcTime }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <StatusPill label="TICK" status={tickerStatus} />
         <StatusPill label="FEED" status={tradeStatus} />
+        <StatusPill label="DEPTH" status={depthStatus} />
       </div>
     </div>
   );

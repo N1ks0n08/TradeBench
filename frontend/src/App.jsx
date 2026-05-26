@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTicker }    from './hooks/useTicker';
 import { useTradeFeed } from './hooks/useTradeFeed';
+import { useDepth } from './hooks/useDepth';
+
 import TopBar  from './components/TopBar';
 import Sidebar from './components/Sidebar';
 import Chart   from './components/Chart';
@@ -17,6 +19,7 @@ export default function App() {
   }, []);
 
   const { bid, ask, status: tickerStatus } = useTicker();
+  const { bids, asks, status: depthStatus } = useDepth();
 
   const {
     completedCandles,
@@ -35,6 +38,7 @@ export default function App() {
       <TopBar
         tickerStatus={tickerStatus}
         tradeStatus={tradeStatus}
+        depthStatus={depthStatus} 
         utcTime={utcTime}
       />
 
@@ -42,6 +46,8 @@ export default function App() {
         <Sidebar
           bid={bid}
           ask={ask}
+          bids={bids}         
+          asks={asks}         
           sessionOpen={sessionOpen}
           sessionHigh={sessionHigh}
           sessionLow={sessionLow}
