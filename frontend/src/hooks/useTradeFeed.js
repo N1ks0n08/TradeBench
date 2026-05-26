@@ -125,13 +125,15 @@ export function useTradeFeed(url = WS_TRADE) {
       setCurrentCandle({ ...updated });
     }
 
+    
+    /* USE FOR DEBUGGING
     console.log('trade:', {
       p: data.p,
       q: data.q,
       qty,
       price,
       tradeVolume
-    });
+    }); */
   }, []);
 
   const status = useReconnectingWS(url, onMessage);

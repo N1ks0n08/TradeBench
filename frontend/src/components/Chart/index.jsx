@@ -119,8 +119,10 @@ export default function Chart({ completedCandles, currentCandle, latency, onSess
     null;
 
   // Note: Remove in production, shows all acquired candles
+  /*
   console.log(completedCandles)
   console.log(`Latest Volume ${latestVolume}`)
+  */
 
   const tfBtnStyle = tf => ({
     background:   activeTf === tf ? '#1e2530' : 'transparent',
